@@ -1,0 +1,8 @@
+
+app/naprrql/naprrql
+
+*.vlog
+
+app/naprrql/kvs/clog
+
+*.zip
