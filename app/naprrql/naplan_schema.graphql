@@ -69,12 +69,20 @@ type NAPEvent {
 type NaplanData {
 	## Test events students participated in
 	events(acaraIDs: [String]): [NAPEvent]
+	## number of student-test events in results set
+	events_count: Int
 	## The student responses from this school
 	responses(acaraIDs: [String]): [NAPResponseSet]
+	## The number of student responses in the reults set
+	responses_count: Int
 	## Students at this school
 	students(acaraIDs: [String]): [RegistrationRecord]
+	## number of student records in resuluts set
+	students_count: Int
 	## summary of scores for school
 	score_summaries(acaraIDs: [String]): [ScoreSummary]
+	## number of score summary objects in results set
+	score_summaries_count: Int
 }
 
 
@@ -102,7 +110,7 @@ type NAPResponseSet {
 	TestLocalID: String 
 	## Detailed scoring breakdown for the test domain of this responses
 	DomainScore: DomainScore
-	## Testlets answered by this student
+	# Testlets answered by this student
 	TestletList: [NAPResponseSet_Testlet]
 }
 
