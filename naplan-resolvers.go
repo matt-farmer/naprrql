@@ -65,6 +65,30 @@ func buildResolvers() map[string]interface{} {
 		return len(getIdentifiers("NAPStudentResponseSet")), nil
 	}
 
+	resolvers["NaplanData/tests_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return len(getIdentifiers("NAPTest")), nil
+	}
+
+	resolvers["NaplanData/tests"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return getObjects(getIdentifiers("NAPTest"))
+	}
+
+	resolvers["NaplanData/testlets_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return len(getIdentifiers("NAPTestlet")), nil
+	}
+
+	resolvers["NaplanData/testlets"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return getObjects(getIdentifiers("NAPTestlet"))
+	}
+
+	resolvers["NaplanData/codeframes_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return len(getIdentifiers("NAPCodeFrame")), nil
+	}
+
+	resolvers["NaplanData/codeframes"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return getObjects(getIdentifiers("NAPCodeFrame"))
+	}
+
 	resolvers["NAPResponseSet/DomainScore"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		domainScore := []interface{}{}
 		if response, ok := params.Source.(xml.NAPResponseSet); ok {

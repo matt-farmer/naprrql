@@ -6,3 +6,5 @@ app/naprrql/naprrql
 app/naprrql/kvs/clog
 
 *.zip
+
+app/naprrql/kvs
