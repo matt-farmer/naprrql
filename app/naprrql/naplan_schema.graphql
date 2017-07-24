@@ -83,6 +83,167 @@ type NaplanData {
 	score_summaries(acaraIDs: [String]): [ScoreSummary]
 	## number of score summary objects in results set
 	score_summaries_count: Int
+	## NAPLAN tests within this results set
+	tests: [NAPTest]
+	## Number of NAPLAN tests within this results set
+	tests_count: Int
+	## Testlets used within this NAPLAN Test 
+	testlets: [NAPTestlet]
+	## Number of teslets used in this NAPLAN test
+	testlets_count: Int
+	## CodeFrame structure of this NAPLAN Test
+	codeframes: [NAPCodeFrame]
+	## number of codeframes in this results set
+	codeframes_count: Int
+}
+
+## CodeFrame that sets structure of this test
+type NAPCodeFrame {
+	## RefID of this codeframe
+	RefId: String
+	## RefID of the NAPLAN Test this codeframe applies to
+	NAPTestRefId: String
+	## Testlets used within this codeframe
+	TestletList: NAPCodeFrame_TestletList
+}
+
+## Testlets used within this codeframe
+type NAPCodeFrame_TestletList {
+	## Testlet reference structure
+	Testlet: [NAPCodeFrame_Testlet]
+}
+
+## Teslet reference strucure for this codeframe
+type NAPCodeFrame_Testlet {
+	## RefID of this testlet
+	NAPTestletRefId: String
+	## Items referenced in this teslet
+	TestItemList: NAPCodeFrame_TestItemList
+}
+
+## Items referenced in this testlet
+type NAPCodeFrame_TestItemList {
+	## Item references
+	TestItem: [NAPCodeFrame_TestItem]
+}
+
+## reference to the test item
+type NAPCodeFrame_TestItem {
+	## Item RefID
+	TestItemRefId: String
+}
+
+
+## A NAPLAN Tetlet; container for test items
+type NAPTestlet {
+	## RefID of testlet
+	TestletID: String
+	## RefID of the NAPLAN Test that uses this Testlet
+	NAPTestRefId: String
+	## Details of the Testlet
+	TestletContent: TestletContent
+	## The items used by the testlet
+	TestItemList: TestItemList
+}
+
+## Details about the nature of the testlet
+type TestletContent {
+	## Local name/id for this testlet
+	LocalId: String
+	## Local name/id for the NAPLAN test that uses the testlet
+	NAPTestLocalId: String
+	## The official name of the testlet
+	TestletName: String
+	## The branching node locaiton of testlet in the test
+	Node: String
+	## The stage this testlet is assigned to in the Test
+	LocationInStage: String
+	## The maximum score that could be achieved within this testlet
+	TestletMaximumScore: String
+}
+
+## The items contained in this testlet
+type TestItemList {
+	## Detail of each item
+	TestItem: [NAPTestlet_TestItem]
+}
+
+## Brief summary information about the test item
+type NAPTestlet_TestItem {
+	## RefID of the test item
+	TestItemRefId: String
+	## Local id/name for the test item
+	TestItemLocalId: String
+	## Location in testing sequence of this item
+	SequenceNumber: String
+}
+
+
+
+## Details of the NAPLAN test itself
+type NAPTest {
+	## RefID for the Test
+	TestID: String      
+	## Test Details
+	TestContent: TestContent 
+}
+
+## The information about the test
+type TestContent {
+	## Local identifier/name for this test
+	LocalId: String
+	## Name of the Test
+	TestName: String
+	## Year level test applies to
+	TestLevel: String
+	## Doamin of this test
+	TestDomain: String
+	## Year test occurs in eg. 2017
+	TestYear: String
+	## Number of stages within this test
+	StagesCount: String
+	## Test type, main test, claibration, sample etc.
+	TestType: String
+	## Domain score bands for this test
+	DomainBands: DomainBands
+	## Domain proficiency bands for this test
+	DomainProficiency: DomainProficiency
+}
+
+## Upper & Lower scores for each band within this test
+type DomainBands {
+	Band1Lower: String
+	Band1Upper: String
+	Band2Lower: String
+	Band2Upper: String
+	Band3Lower: String
+	Band3Upper: String
+	Band4Lower: String
+	Band4Upper: String
+	Band5Lower: String
+	Band5Upper: String
+	Band6Lower: String
+	Band6Upper: String
+	Band7Lower: String
+	Band7Upper: String
+	Band8Lower: String
+	Band8Upper: String
+	Band9Lower: String
+	Band9Upper: String
+	Band10Lower: String
+	Band10Upper: String
+}
+
+## Upper and lower bounds for proficiency bands
+type DomainProficiency {
+	Level1Lower: String
+	Level1Upper: String
+	Level2Lower: String
+	Level2Upper: String
+	Level3Lower: String
+	Level3Upper: String
+	Level4Lower: String
+	Level4Upper: String
 }
 
 
