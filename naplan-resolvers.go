@@ -49,6 +49,14 @@ func buildResolvers() map[string]interface{} {
 		return getObjects(getIdentifiers("NAPTest"))
 	}
 
+	resolvers["NaplanData/schools_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return len(getIdentifiers("SchoolInfo")), nil
+	}
+
+	resolvers["NaplanData/schools"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return getObjects(getIdentifiers("SchoolInfo"))
+	}
+
 	resolvers["NaplanData/testlets_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return len(getIdentifiers("NAPTestlet")), nil
 	}
