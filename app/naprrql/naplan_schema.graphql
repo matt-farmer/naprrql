@@ -112,6 +112,11 @@ type NaplanData {
 	testitems: [NAPTestItem]
 	## Number of test items in this results set
 	testitems_count: Int
+	## School details of schools in this result set
+	schools: [SchoolInfo]
+	## Number of schools in this results set
+	schools_count: Int
+
 }
 
 ## CodeFrame that sets structure of this test
@@ -694,8 +699,243 @@ type ScoreSummary {
 	DomainBottomNational60Percent: String
 }
 
-# type SchoolInfo {	
-# }
+## Administrative information about a School
+type SchoolInfo {
+	## refid of this school
+	RefId: String
+	## local name/id for school
+	LocalId: String
+	## jurisdiction id for school
+	StateProvinceId: String
+	## ASL id for school
+	ACARAId: String
+	## name of the school
+	SchoolName: String
+	## Education Authority refid 
+	LEAInfoRefId: String
+	## Association with any other organisation or LEA
+	OtherLEA: String
+	## school district 
+	SchoolDistrict: String
+	## school type
+	SchoolType: String
+	## no. students enroled
+	StudentCount: String #non xml field added for reporting
+	## special area of attention for school
+	SchoolFocusList: SchoolFocusList
+	## school website
+	SchoolURL: String
+	## contact details for principal 
+	PrincipalInfo: PrincipalInfo
+	## contact details for the school
+	SchoolContactList: SchoolContactList
+	## phone numbers that can be used to contact school
+	PhoneNumberList: PhoneNumberList
+	## session type
+	SessionType: String
+	## year levels taught at this school
+	YearLevels: YearLevelList
+	## ARIA status code
+	ARIA: String
+	## operaitonal staus; eg. closed, open, merging etc.
+	OperationalStatus: String
+	## federal electorate school is in
+	FederalElectorate: String
+	## campus school is part of
+	Campus: Campus
+	## gov't or non-gov, catholic etc.
+	SchoolSector: String
+	## independent school flag
+	IndependentSchool: String
+	## systemic or not, eg non-systemic catholic
+	NonGovSystemicStatus: String
+	## which system belongs to, if any
+	System: String
+	## nature of religious affiliation
+	ReligiousAffiliation: String
+	## where it is; metro, country, remote etc.
+	SchoolGeographicLocation: String
+	## LGA school is in
+	LocalGovernmentArea: String
+	## MP jurisdiction for this school
+	JurisdictionLowerHouse: String
+	## SLA
+	SLA: String
+	## school is co-ed or single-sex
+	SchoolCoEdStatus: String
+	## belongs to school network
+	SchoolGroupList: SchoolGroupList
+}
+
+## list of school groups school can belong to
+type SchoolGroupList {
+	## names of school group
+	SchoolGroup: [String]
+}
+
+## Campus school belongs to
+type Campus {
+	## id of campus 
+	SchoolCampusId: String 
+	## campus type
+	CampusType: String
+	## administrativ status of campus
+	AdminStatus: String
+}
+
+## list container for year levels taught by school
+type YearLevelList {
+	YearLevel: [YearLevel] 
+}
+
+## year levels taught by the school 
+type YearLevel  {
+	Code: String
+}
+
+## list container for phone number contacts
+type PhoneNumberList {
+	## phone numbers
+	PhoneNumber: [PhoneNumber]
+}
+
+## phone number details
+type PhoneNumber {
+	## type of number
+	Type: String
+	## the phone number
+	Number: String
+}
+
+## container list for school focus areas
+type SchoolFocusList {
+	## school focus type
+	SchoolFocus: [String]
+}
+
+## Name Abstraction for use in multiple objects
+type NameType {
+	## Name Type
+	Type: String
+	## Salutation
+	Title: String
+	## Family name
+	FamilyName: String
+	## First name
+	GivenName: String
+	## middle name
+	MiddleName: String
+	## Suffix
+	Suffix: String
+	## long form name
+	FullName: String
+}
+
+## list container for email
+type EmailList {
+	## email addresses
+	Email: Email
+}
+
+## email list members
+type Email {
+	## email type
+	Type: String
+	## email address
+	Address: String
+}
+
+## list container for complete phone numbers
+type FullPhoneNumberList {
+	## list items
+	PhoneNumber: [FullPhoneNumber]
+}
+
+## Complete phone number details
+type FullPhoneNumber {
+	## phone number type
+	Type: String
+	## the phone number
+	Number: String
+	## extension number
+	Extension: String
+	## whether number is ex-directory
+	ListedStatus: String
+}
+
+# Information about the school Principal
+type PrincipalInfo {
+	## name of principal contact
+	ContactName: NameType
+	## title of contact
+	ContactTitle: String
+}
+
+## list container for school contact details
+type SchoolContactList {
+	## school contact list items
+	SchoolContact: [SchoolContact]
+}
+
+## container for contact information
+type SchoolContact {
+	## whether this infomation can be published externally
+	PublishInDirectory: String
+	## contact information object
+	ContactInfo: ContactInfo
+}
+
+## contact information details
+type ContactInfo {
+	## contact name
+	Name: NameType
+	## job title
+	PositionTitle: String
+	## role
+	Role: String
+	## link to address structure
+	Address: Address
+	## list of contact email addresses
+	EmailList: EmailList
+	## list of contact phone numbers
+	PhoneNumberList: FullPhoneNumberList
+}
+
+## address information
+type Address {
+	## adress type
+	Type: String
+	## address role
+	Role: String
+	## street details
+	Street: Street
+	## city
+	City: String 
+	## state, territory 
+	StateProvince: String
+	## country
+	Country: String
+	## postcaode
+	PostalCode: String
+	## link to grid location
+	GridLocation: GridLocation
+}
+
+## street details
+type Street {
+	## line1 is special it seems
+	Line1: String
+}
+
+## long-lat grid coordinates of school
+type GridLocation {
+	## latitude coordinate
+	Latitude: String
+	## longitude coordinate
+	Longitude: String
+}
+
+
 
 
 
