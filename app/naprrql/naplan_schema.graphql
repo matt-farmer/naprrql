@@ -95,6 +95,10 @@ type NaplanData {
 	codeframes: [NAPCodeFrame]
 	## number of codeframes in this results set
 	codeframes_count: Int
+	## Test Items used in this NAPLAN test
+	testitems: [NAPTestItem]
+	## Number of test items in this results set
+	testitems_count: Int
 }
 
 ## CodeFrame that sets structure of this test
@@ -272,8 +276,15 @@ type NAPResponseSet {
 	## Detailed scoring breakdown for the test domain of this responses
 	DomainScore: DomainScore
 	# Testlets answered by this student
-	TestletList: [NAPResponseSet_Testlet]
+	TestletList: TestletList
 }
+
+## list of testlets used by this response
+type TestletList {
+	## testlet details list
+	Testlet: [NAPResponseSet_Testlet]
+}
+
 
 ## Testlet taken by this student
 type NAPResponseSet_Testlet {
@@ -284,8 +295,16 @@ type NAPResponseSet_Testlet {
 	## score for this testlet 
 	TestletScore: String
 	## Responses to each of the items the testlet contains
-	ItemResponseList: [NAPResponseSet_ItemResponse]
+	ItemResponseList: ItemResponseList
 }
+
+## list container for item responses
+type ItemResponseList {
+	## item responses by this student
+	ItemResponse: [NAPResponseSet_ItemResponse]
+}
+
+
 
 ## Item-level responses within a testlet
 type NAPResponseSet_ItemResponse {
@@ -308,8 +327,15 @@ type NAPResponseSet_ItemResponse {
 	## weighting / importance
 	ItemWeight: String 
 	## sub-scores eg. for subcomponents of writing
-	SubscoreList: [NAPResponseSet_Subscore]
+	SubscoreList: SubscoreList
 }
+
+## list container for item subscores
+type SubscoreList {
+	## the subscores
+	Subscore: [NAPResponseSet_Subscore]
+}
+
 
 ## Test Item Container
 type NAPTestItem {
@@ -359,8 +385,109 @@ type TestItemContent {
 	ItemProficiencyLevel: String 
 	## URL for exemplar, remote system 
 	ExemplarURL: String 
+	## Items this Item may be a substitute for
+	ItemSubstitutedForList: ItemSubstitutedForList
+	## Descriptors for Item content
+	ContentDescriptionList: ContentDescriptionList
+	## List of writing stimulus types
+	StimulusList: StimulusList
+	## Details of writing rubrics used in this item
+	NAPWritingRubricList: NAPWritingRubricList
 }
 
+## List of items this item can substitute for
+type ItemSubstitutedForList {
+	## Link to item that can be substituted
+	SubstituteItem: [SubstituteItem]
+}
+
+## Details of substitute item
+type SubstituteItem {
+	## RefID of substitutable item
+	SubstituteItemRefId: String
+	## local name/id for substitutable item
+	LocalId: String
+	## PNP Codes assigned to this item
+	PNPCodeList: PNPCodeList
+}
+
+## PNP Codes associated with this item
+type PNPCodeList {
+	## List of codes
+	PNPCode: [String]
+}
+
+## Content descriptors for this item
+type ContentDescriptionList {
+	## Descriptors
+	ContentDescription: [String]
+}
+
+## Text Stimuli associated with this item
+type StimulusList {
+	## Stimuli
+	Stimulus: [Stimulus]
+}
+
+## Text Stimulus
+type Stimulus {
+	## local name/id for this stimulus
+	LocalId: String 
+	## text Genre
+	TextGenre: String
+	## text type
+	TextType: String
+	## wordcount
+	WordCount: String
+	## text descriptor
+	TextDescriptor: String
+	## text content
+	Content: String
+}
+
+## Writing rubrics associated with this item
+type NAPWritingRubricList {
+	## Rubric details
+	NAPWritingRubric: [NAPWritingRubric]
+}
+
+## Wrting rubric details
+type NAPWritingRubric {
+	## rubric type
+	RubricType: String
+	## descriptor
+	Descriptor: String
+	## score list
+	ScoreList: ScoreList
+}
+
+## score list for this rubric
+type ScoreList {
+	## score structure 
+	Score: [Score]
+}
+
+## Score details
+type Score {
+	## maximum score available 
+	MaxScoreValue: String
+	## sub-score descriptions
+	ScoreDescriptionList: ScoreDescriptionList
+}
+
+## descriptions of subscore components
+type ScoreDescriptionList {
+	## subscore descriptions
+	ScoreDescription: [ScoreDescription] 
+}
+
+## score description details
+type ScoreDescription {
+	## score value
+	ScoreValue: String
+	## score descriptor
+	Descriptor: String
+}
 
 ## Detailed subscores for domains such as writing
 type NAPResponseSet_Subscore {
@@ -387,7 +514,13 @@ type DomainScore {
 	## Proficiency of student
 	StudentProficiency: String
 	## Plausible values list for this domain 
-	PlausibleScaledValueList: [String]
+	PlausibleScaledValueList: PlausibleScaledValueList
+}
+
+# list container type for plausible scled values
+type PlausibleScaledValueList {
+	# plausible scaled value
+	PlausibleScaledValue: [String]
 }
 
 ## Student Personal information
