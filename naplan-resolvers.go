@@ -25,36 +25,12 @@ func buildResolvers() map[string]interface{} {
 		return len(getIdentifiers("StudentPersonal")), nil
 	}
 
-	resolvers["RegistrationRecord/OtherIdList"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		otherIDs := []interface{}{}
-		if napRegistrationRecord, ok := params.Source.(xml.RegistrationRecord); ok {
-			return napRegistrationRecord.OtherIdList.OtherId, nil
-		}
-		return otherIDs, nil
-	}
-
 	resolvers["NaplanData/events"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return getObjects(getIdentifiers("NAPEventStudentLink"))
 	}
 
 	resolvers["NaplanData/events_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return len(getIdentifiers("NAPEventStudentLink")), nil
-	}
-
-	resolvers["NAPEvent/TestDisruptionList"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		disruptionEvents := []interface{}{}
-		if napEvent, ok := params.Source.(xml.NAPEvent); ok {
-			return napEvent.TestDisruptionList.TestDisruption, nil
-		}
-		return disruptionEvents, nil
-	}
-
-	resolvers["Adjustment/PNPCodeList"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		pnpCodes := []interface{}{}
-		if adjustment, ok := params.Source.(xml.Adjustment); ok {
-			return adjustment.PNPCodelist.PNPCode, nil
-		}
-		return pnpCodes, nil
 	}
 
 	resolvers["NaplanData/responses"] = func(params *graphql.ResolveParams) (interface{}, error) {

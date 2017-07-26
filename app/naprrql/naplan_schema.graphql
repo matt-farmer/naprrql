@@ -8,9 +8,15 @@ type TestDisruption {
 ## Adjustments for the student in this event
 type Adjustment {
 	## List of PNP codes applied to this student
-	PNPCodeList: [String]
+	PNPCodelist: PNPCodelist
 	## Booklet type requirement for this student
 	BookletType: String
+}
+
+## list container for pnp codes associated with this event
+type PNPCodelist {
+	## the pnp codes associated with this event
+	PNPCode: [String]
 }
 
 ## A NAP Testing event
@@ -60,10 +66,17 @@ type NAPEvent {
 	## Date of Birth range
 	DOBRange: String
 	## List of test disruptions for this event/student
-	TestDisruptionList: [TestDisruption]
+	TestDisruptionList: TestDisruptionList
 	## List of adjustments for this event/student
 	Adjustment: Adjustment
 }
+
+## list container for test disruptions
+type TestDisruptionList {
+	## test disruptions
+	TestDisruption: [TestDisruption]
+}
+
 
 ## All NAPLAN Test results data for a given school
 type NaplanData {
@@ -532,7 +545,7 @@ type RegistrationRecord {
 	## State/Province ID of student
 	StateProvinceId: String 
 	## Key-Value list of all ids associated with student, including past/present variants
-	OtherIdList: [XMLAttributeStruct]
+	OtherIdList: OtherIdList
 	## Family Name, surname of student
 	FamilyName: String 
 	## Given Name of Student
@@ -642,6 +655,12 @@ type RegistrationRecord {
 	# SectorId: String 
 	# TAA id, ingest only in results reporting use otherid list
 	# TAAId: String 
+}
+
+## list container for other student ids
+type OtherIdList {
+	## list of other ids
+	OtherId: [XMLAttributeStruct]
 }
 
 ## key-value pairs for other ids
