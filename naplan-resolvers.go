@@ -81,6 +81,14 @@ func buildResolvers() map[string]interface{} {
 		return getObjects(getIdentifiers("NAPTestlet"))
 	}
 
+	resolvers["NaplanData/testitems_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return len(getIdentifiers("NAPTestItem")), nil
+	}
+
+	resolvers["NaplanData/testitems"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return getObjects(getIdentifiers("NAPTestItem"))
+	}
+
 	resolvers["NaplanData/codeframes_count"] = func(params *graphql.ResolveParams) (interface{}, error) {
 		return len(getIdentifiers("NAPCodeFrame")), nil
 	}
@@ -89,34 +97,10 @@ func buildResolvers() map[string]interface{} {
 		return getObjects(getIdentifiers("NAPCodeFrame"))
 	}
 
-	resolvers["NAPResponseSet/DomainScore"] = func(params *graphql.ResolveParams) (interface{}, error) {
-		domainScore := []interface{}{}
-		if response, ok := params.Source.(xml.NAPResponseSet); ok {
-			return response.DomainScore, nil
-		}
-		return domainScore, nil
-	}
-
-	resolvers["NAPResponseSet/TestletList"] = func(params *graphql.ResolveParams) (interface{}, error) {
-
-		testletList := []interface{}{}
-		if response, ok := params.Source.(xml.NAPResponseSet); ok {
-			return response.TestletList.Testlet, nil
-		}
-		return testletList, nil
-	}
-
-	resolvers["NAPResponseSet_Testlet/ItemResponseList"] = func(params *graphql.ResolveParams) (interface{}, error) {
-
-		itemList := []interface{}{}
-		// log.Printf("params: %#v\n\n", params)
-		if napResponse, ok := params.Source.(xml.NAPResponseSet_Testlet); ok {
-			return napResponse.ItemResponseList.ItemResponse, nil
-		}
-		return itemList, nil
-
-	}
-
+	//
+	// addition to spec that allows the original Item to be available when
+	// reviewing item responses, e.g. to compare item correct response, item type etc.
+	//
 	resolvers["NAPResponseSet_ItemResponse/Item"] = func(params *graphql.ResolveParams) (interface{}, error) {
 
 		linkedItem := make([]string, 0)
@@ -127,17 +111,6 @@ func buildResolvers() map[string]interface{} {
 			return obj[0], err
 		}
 		return linkedItem, nil
-
-	}
-
-	resolvers["NAPResponseSet_ItemResponse/SubscoreList"] = func(params *graphql.ResolveParams) (interface{}, error) {
-
-		subscoreList := []interface{}{}
-		// log.Printf("params: %#v\n\n", params)
-		if napResponse, ok := params.Source.(xml.NAPResponseSet_ItemResponse); ok {
-			return napResponse.SubscoreList.Subscore, nil
-		}
-		return subscoreList, nil
 
 	}
 

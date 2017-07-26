@@ -8,3 +8,4 @@ app/naprrql/kvs/clog
 *.zip
 
 app/naprrql/kvs
+app/naprrql/master_nap.xml
