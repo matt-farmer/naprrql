@@ -57,12 +57,10 @@ func IngestResultsFile(resultsFilePath string) {
 				}
 
 				// {NAPTest} = object
-				// entries = badger.EntriesSet(entries, []byte(t.TestID), gt)
 				batch.Put([]byte(t.TestID), gt)
 
 				// NAPTest-type:{id} = id
 				key := []byte("NAPTest:" + t.TestID)
-				// entries = badger.EntriesSet(entries, key, []byte(t.TestID))
 				batch.Put(key, []byte(t.TestID))
 
 				totalTests++
@@ -76,12 +74,10 @@ func IngestResultsFile(resultsFilePath string) {
 				}
 
 				// {NAPTestlet} = object
-				// entries = badger.EntriesSet(entries, []byte(tl.TestletID), gtl)
 				batch.Put([]byte(tl.TestletID), gtl)
 
 				// NAPTestlet-type:{id} = {id}
 				key := []byte("NAPTestlet:" + tl.TestletID)
-				// entries = badger.EntriesSet(entries, key, []byte(tl.TestletID))
 				batch.Put(key, []byte(tl.TestletID))
 
 				totalTestlets++
@@ -95,12 +91,10 @@ func IngestResultsFile(resultsFilePath string) {
 				}
 
 				// {NAPTestItem} = object
-				// entries = badger.EntriesSet(entries, []byte(ti.ItemID), gti)
 				batch.Put([]byte(ti.ItemID), gti)
 
 				// NapTestItem-type:{id} = {id}
 				key := []byte("NAPTestItem:" + ti.ItemID)
-				// entries = badger.EntriesSet(entries, key, []byte(ti.ItemID))
 				batch.Put(key, []byte(ti.ItemID))
 
 				totalTestItems++
@@ -109,40 +103,20 @@ func IngestResultsFile(resultsFilePath string) {
 				var tss xml.NAPTestScoreSummary
 				decoder.DecodeElement(&tss, &se)
 
-				// jtss, err := jsonEncode(tss)
-				// if err != nil {
-				// 	log.Println("Unable to json-encode nap test-score-summary: ", err)
-				// }
-
 				gtss, err := ge.Encode(tss)
 				if err != nil {
 					log.Println("Unable to gob-encode nap test-score-summary: ", err)
 				}
 
-				// var tss2 interface{}
-				// err = ge.Decode(gtss, &tss2)
-				// if err != nil {
-				// 	log.Println("summary did not decode: ", err)
-				// 	// log.Printf("\n\ndecoded summary:\n\n%+v\n", tss2)
-				// }
-				// tss3, ok := tss2.(xml.NAPTestScoreSummary)
-				// if !ok {
-				// 	log.Println("summary type assertion failed")
-				// 	log.Printf("\n\ndecoded summary:\n\n%+v\n", tss3)
-				// }
-
 				// {NAPTestScoreSummary} = object
-				// entries = badger.EntriesSet(entries, []byte(tss.SummaryID), jtss)
 				batch.Put([]byte(tss.SummaryID), gtss)
 
 				// NAPTestScoreSummary-type:{id} = {id}
 				key := []byte("NAPTestScoreSummary:" + tss.SummaryID)
-				// entries = badger.EntriesSet(entries, key, []byte(tss.SummaryID))
 				batch.Put(key, []byte(tss.SummaryID))
 
 				// {school}:NAPTestScoreSummary-type:{id} = {id}
 				key = []byte(tss.SchoolInfoRefId + ":NAPTestScoreSummary:" + tss.SummaryID)
-				// entries = badger.EntriesSet(entries, key, []byte(tss.SummaryID))
 				batch.Put(key, []byte(tss.SummaryID))
 
 				totalTestScoreSummarys++
@@ -155,25 +129,15 @@ func IngestResultsFile(resultsFilePath string) {
 					log.Println("Unable to gob-encode nap event link: ", err)
 				}
 
-				// var e2 xml.NAPEvent
-				// err = ge.Decode(gev, &e2)
-				// if err != nil {
-				// 	log.Println("event did not decode: ", err)
-				// 	// log.Printf("\n\ndecoded event:\n\n%+v\n", e2)
-				// }
-
 				// {NAPEventStudentLink} = object
-				// entries = badger.EntriesSet(entries, []byte(e.EventID), gev)
 				batch.Put([]byte(e.EventID), gev)
 
 				// NAPEventStudentLink-type:{id} = {id}
 				key := []byte("NAPEventStudentLink:" + e.EventID)
-				// entries = badger.EntriesSet(entries, key, []byte(e.EventID))
 				batch.Put(key, []byte(e.EventID))
 
 				// {school}:NAPEventStudentLink-type:{id} = {id}
 				key = []byte(e.SchoolRefID + ":NAPEventStudentLink:" + e.EventID)
-				// entries = badger.EntriesSet(entries, key, []byte(e.EventID))
 				batch.Put(key, []byte(e.EventID))
 
 				totalEvents++
@@ -182,43 +146,20 @@ func IngestResultsFile(resultsFilePath string) {
 				var r xml.NAPResponseSet
 				decoder.DecodeElement(&r, &se)
 
-				// log.Printf("response: \n\n%v\n\n", r)
-
-				// jr, err := jsonEncode(r)
-				// if err != nil {
-				// 	log.Println("Unable to json-encode student response set: ", err)
-				// }
-
-				// b := new(bytes.Buffer)
-				// enc := gob.NewEncoder(b)
-				// if err := enc.Encode(&r); err != nil {
-				// 	log.Println("unable to gob-encode response set: ", err)
-				// }
-
 				gr, err := ge.Encode(r)
 				if err != nil {
 					log.Println("Unable to gob-encode student response set: ", err)
 				}
 
-				// var r2 xml.NAPResponseSet
-				// err = ge.Decode(gr, &r2)
-				// if err != nil {
-				// 	log.Println("response did not decode: ", err)
-				// 	// log.Printf("\n\ndecoded response:\n\n%+v\n", r2)
-				// }
-
 				// {response-id} = object
-				// entries = badger.EntriesSet(entries, []byte(r.ResponseID), b.Bytes())
 				batch.Put([]byte(r.ResponseID), gr)
 
 				// response-type:{id} = {id}
 				key := []byte("NAPStudentResponseSet:" + r.ResponseID)
-				// entries = badger.EntriesSet(entries, key, []byte(r.ResponseID))
 				batch.Put(key, []byte(r.ResponseID))
 
 				// {test}:NAPStudentResponseSet-type:{student} = {id}
 				key = []byte(r.TestID + ":NAPStudentResponseSet:" + r.StudentID)
-				// entries = badger.EntriesSet(entries, key, []byte(r.ResponseID))
 				batch.Put(key, []byte(r.ResponseID))
 
 				totalResponses++
@@ -232,12 +173,10 @@ func IngestResultsFile(resultsFilePath string) {
 				}
 
 				// {NAPCodeFrame-id} = object
-				// entries = badger.EntriesSet(entries, []byte(cf.RefId), gcf)
 				batch.Put([]byte(cf.RefId), gcf)
 
 				// NAPCodeFrame-type:{id} = {id}
 				key := []byte("NAPCodeFrame:" + cf.RefId)
-				// entries = badger.EntriesSet(entries, key, []byte(cf.RefId))
 				batch.Put(key, []byte(cf.RefId))
 
 				totalCodeFrames++
@@ -251,18 +190,17 @@ func IngestResultsFile(resultsFilePath string) {
 				}
 
 				// {SchoolInfo-id} = object
-				// entries = badger.EntriesSet(entries, []byte(si.RefId), gsi)
 				batch.Put([]byte(si.RefId), gsi)
 
 				// SchoolInfo-type:{id} = {id}
 				key := []byte("SchoolInfo:" + si.RefId)
-				// entries = badger.EntriesSet(entries, key, []byte(si.RefId))
 				batch.Put(key, []byte(si.RefId))
 
 				// ASL lookup
 				key = []byte(si.ACARAId)
-				// entries = badger.EntriesSet(entries, key, []byte(si.RefId))
 				batch.Put(key, []byte(si.RefId))
+
+				// SchoolDetails lookup object
 
 				totalSchools++
 
@@ -275,17 +213,14 @@ func IngestResultsFile(resultsFilePath string) {
 				}
 
 				// {StudentPersonal-id} = object
-				// entries = badger.EntriesSet(entries, []byte(sp.RefId), gsp)
 				batch.Put([]byte(sp.RefId), gsp)
 
 				// StudentPersonal-type:{id} = {id}
 				key := []byte("StudentPersonal:" + sp.RefId)
-				// entries = badger.EntriesSet(entries, key, []byte(sp.RefId))
 				batch.Put(key, []byte(sp.RefId))
 
 				// {ASL-school-id}:StudentPersonal-type:{id} = {id}
 				key = []byte(sp.ASLSchoolId + ":StudentPersonal:" + sp.RefId)
-				// entries = badger.EntriesSet(entries, key, []byte(sp.RefId))
 				batch.Put(key, []byte(sp.RefId))
 
 				totalStudents++
@@ -295,11 +230,6 @@ func IngestResultsFile(resultsFilePath string) {
 		}
 
 	}
-
-	// fmt.Println("entries:")
-	// for _, entry := range entries {
-	// 	fmt.Printf("key: %s\n val: %s\n\n", entry.Key, entry.Value)
-	// }
 
 	batcherr := db.Write(batch, nil)
 	if batcherr != nil {
