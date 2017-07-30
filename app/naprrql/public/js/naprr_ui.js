@@ -144,15 +144,37 @@ function initSchoolChooserHandlerQL() {
 
         // });
 
+        // 
+        // get the schoolinfo object for the selected school
+        // 
+        var query = schoolInfoQuery();
+        var xhrSI = new XMLHttpRequest();
+        xhrSI.responseType = 'json';
+        xhrSI.open("POST", "/graphql");
+        xhrSI.setRequestHeader("Content-Type", "application/json");
+        xhrSI.setRequestHeader("Accept", "application/json");
+        xhrSI.onload = function() {
+            // console.log('data returned:', xhrSI.response);
+            schoolinfoData = {};
+            schoolinfoData = xhrSI.response.data.school_infos_by_acaraid[0];
+        }
+        xhrSI.send(JSON.stringify({
+            query: query,
+            variables: { acaraIDs: [currentASLId] },
+        }));
+
+
+        // 
+        // get the score summaries for the selected school
+        // 
         var query = scoreSummaryQuery();
-        // var schools = {acaraIDs:["21212"]};
         var xhrSS = new XMLHttpRequest();
         xhrSS.responseType = 'json';
         xhrSS.open("POST", "/graphql");
         xhrSS.setRequestHeader("Content-Type", "application/json");
         xhrSS.setRequestHeader("Accept", "application/json");
         xhrSS.onload = function() {
-            console.log('data returned:', xhrSS.response);
+            // console.log('data returned:', xhrSS.response);
             scoresummaryData = [];
             scoresummaryData = xhrSS.response.data.score_summary_report_by_school;
             hideReport();
@@ -213,25 +235,6 @@ function initSchoolChooserHandlerQL() {
         //     if (debug) {
         //         console.log(schoolinfoData);
         //     }
-        var query = schoolInfoQuery();
-        // var schools = {acaraIDs:["21212"]};
-        var xhrSI = new XMLHttpRequest();
-        xhrSI.responseType = 'json';
-        xhrSI.open("POST", "/graphql");
-        xhrSI.setRequestHeader("Content-Type", "application/json");
-        xhrSI.setRequestHeader("Accept", "application/json");
-        xhrSI.onload = function() {
-            console.log('data returned:', xhrSI.response);
-            schoolinfoData = {};
-            schoolinfoData = xhrSI.response.data.school_infos_by_acaraid[0];
-            // hideReport();
-            // createScoreSummaryReport();
-            // showReport();
-        }
-        xhrSI.send(JSON.stringify({
-            query: query,
-            variables: { acaraIDs: [currentASLId] },
-        }));
 
 
 
