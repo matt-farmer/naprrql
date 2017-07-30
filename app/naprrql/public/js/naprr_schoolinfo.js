@@ -30,35 +30,106 @@ $(document).ready(function()
 // gql query to support search
 // 
 function schoolInfoQuery() {
-    return `query NAPData($acaraIDs: [String]) {
-              school_infos_by_acaraid(acaraIDs: $acaraIDs) {
-                RefId
-                LocalId
-                StateProvinceId
-                ACARAId
-                SchoolName
-                LEAInfoRefId
-                OtherLEA
-                SchoolDistrict
-                SchoolType
-                StudentCount
-                SchoolURL
-                SessionType
-                ARIA
-                OperationalStatus
-                FederalElectorate
-                SchoolSector
-                IndependentSchool
-                NonGovSystemicStatus
-                System
-                ReligiousAffiliation
-                SchoolGeographicLocation
-                LocalGovernmentArea
-                JurisdictionLowerHouse
-                SLA
-                SchoolCoEdStatus
-              }
-            }`;
+    return `
+query NAPData($acaraIDs: [String]) {
+  school_infos_by_acaraid(acaraIDs: $acaraIDs) {
+    RefId
+    LocalId
+    StateProvinceId
+    ACARAId
+    SchoolName
+    LEAInfoRefId
+    OtherLEA
+    SchoolDistrict
+    SchoolType
+    StudentCount
+    SchoolURL
+    SessionType
+    ARIA
+    OperationalStatus
+    FederalElectorate
+    SchoolSector
+    IndependentSchool
+    NonGovSystemicStatus
+    System
+    ReligiousAffiliation
+    SchoolGeographicLocation
+    LocalGovernmentArea
+    JurisdictionLowerHouse
+    SLA
+    SchoolCoEdStatus
+    YearLevels{
+      YearLevel {
+        Code
+      }
+    }
+    Campus {
+      SchoolCampusId
+      CampusType
+      AdminStatus
+    }
+    PrincipalInfo{
+      ContactName {
+        Type
+        Title
+        FamilyName
+        GivenName
+        MiddleName
+        Suffix
+        FullName
+      }
+      ContactTitle
+    }
+    SchoolContactList{
+      SchoolContact{
+        ContactInfo{
+          Name {
+            Type
+            Title
+            FamilyName
+            GivenName
+            MiddleName
+            Suffix
+            FullName
+          }
+          PositionTitle
+          Role
+          Address {
+            Type
+            Role
+            Street{
+              Line1
+            }
+            City
+            StateProvince
+            Country
+            PostalCode
+            GridLocation {
+              Latitude
+              Longitude
+            }
+          }
+          EmailList{
+            Email {
+              Type
+              Address
+            }
+          }
+          PhoneNumberList{
+            PhoneNumber {
+              Type
+              Number
+              Extension
+              ListedStatus
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+`;
 }
 
 // 

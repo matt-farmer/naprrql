@@ -96,7 +96,12 @@
                     <div class="row">
                         <div class="input-field col s11">
                             <i class="material-icons prefix">search</i>
-                            <input type="text" id="autocomplete-input" class="autocomplete">
+                            <!-- note: autocomplete='off' attr. below refers to -->
+                            <!-- the browser supplying previously typed  -->
+                            <!-- suggestions, not the actual autocomplete -->
+                            <!-- functionality which retrieves keywords -->
+                            <!-- from the server -->                            
+                            <input type="text" id="autocomplete-input" class="autocomplete" autocomplete="off">
                             <label for="autocomplete-input">Choose A School</label>
                         </div>
                         <div class="col s1">
