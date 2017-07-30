@@ -1,6 +1,7 @@
 package naprrql
 
 import (
+	"github.com/nsip/nias2/naprr"
 	"github.com/nsip/nias2/xml"
 	"github.com/playlyfe/go-graphql"
 )
@@ -95,6 +96,89 @@ func buildResolvers() map[string]interface{} {
 			return obj[0], err
 		}
 		return linkedItem, nil
+
+	}
+
+	//
+	// shorthand lookup objects for basic school info
+	//
+	resolvers["NaplanData/school_details"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		return getObjects(getIdentifiers("SchoolDetails"))
+	}
+
+	//
+	// resolver for score summary report object
+	//
+	resolvers["NaplanData/score_summary_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get the sif refid for each of the acarids supplied
+		refids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			refid := getIdentifiers(acaraid)[0]
+			refids = append(refids, refid)
+		}
+
+		// now construct the composite keys
+		school_summary_keys := make([]string, 0)
+		for _, refid := range refids {
+			school_summary_keys = append(school_summary_keys, refid+":NAPTestScoreSummary")
+		}
+
+		summ_refids := make([]string, 0)
+		for _, summary_key := range school_summary_keys {
+			ids := getIdentifiers(summary_key)
+			for _, id := range ids {
+				summ_refids = append(summ_refids, id)
+			}
+		}
+
+		summaries, err := getObjects(summ_refids)
+		summary_datasets := make([]naprr.ScoreSummaryDataSet, 0)
+		for _, summary := range summaries {
+			summ, _ := summary.(xml.NAPTestScoreSummary)
+			testid := []string{summ.NAPTestRefId}
+			obj, _ := getObjects(testid)
+			test, _ := obj[0].(xml.NAPTest)
+			sds := naprr.ScoreSummaryDataSet{Summ: summ, Test: test}
+			summary_datasets = append(summary_datasets, sds)
+		}
+
+		return summary_datasets, err
+
+	}
+
+	resolvers["NaplanData/school_infos_by_acaraid"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get the sif refid for each of the acarids supplied
+		refids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			refid := getIdentifiers(acaraid)[0]
+			refids = append(refids, refid)
+		}
+
+		// get the school infos from the datastore
+		siObjects, err := getObjects(refids)
+		schoolInfos := make([]xml.SchoolInfo, 0)
+		for _, sio := range siObjects {
+			si, _ := sio.(xml.SchoolInfo)
+			schoolInfos = append(schoolInfos, si)
+		}
+
+		return schoolInfos, err
 
 	}
 

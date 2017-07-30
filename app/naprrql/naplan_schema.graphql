@@ -93,9 +93,11 @@ type NaplanData {
 	## number of student records in resuluts set
 	students_count: Int
 	## summary of scores for school
-	score_summaries(acaraIDs: [String]): [ScoreSummary]
+	score_summaries: [ScoreSummary]
 	## number of score summary objects in results set
 	score_summaries_count: Int
+	## reporting (ui) object for score summaries
+	score_summary_report_by_school(acaraIDs: [String]): [ScoreSummaryDataSet]
 	## NAPLAN tests within this results set
 	tests: [NAPTest]
 	## Number of NAPLAN tests within this results set
@@ -112,11 +114,22 @@ type NaplanData {
 	testitems: [NAPTestItem]
 	## Number of test items in this results set
 	testitems_count: Int
-	## School details of schools in this result set
+	## School info of schools in this result set
 	schools: [SchoolInfo]
 	## Number of schools in this results set
 	schools_count: Int
+	## School basic details (name, acara asl id)
+	school_details: [SchoolDetails]
+	## Get school info data for schools identified by ASL id
+	school_infos_by_acaraid(acaraIDs: [String]): [SchoolInfo]
+}
 
+## score summary reporting object
+type ScoreSummaryDataSet {
+	## the score summary
+	Summ: ScoreSummary
+	## the related test
+	Test: NAPTest
 }
 
 ## CodeFrame that sets structure of this test
@@ -935,7 +948,13 @@ type GridLocation {
 	Longitude: String
 }
 
-
+## SchoolDetails is shorthand lookup object for name & acaraid of a school
+type SchoolDetails {
+	## the name of the school
+	SchoolName: String
+	## the ASL Id of the school
+	ACARAId: String
+}
 
 
 
