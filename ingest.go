@@ -4,6 +4,7 @@ import (
 	goxml "encoding/xml"
 	"log"
 
+	"github.com/nats-io/nuid"
 	"github.com/nsip/nias2/naprr"
 	"github.com/nsip/nias2/xml"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -119,6 +120,8 @@ func IngestResultsFile(resultsFilePath string) {
 				key = []byte(tss.SchoolInfoRefId + ":NAPTestScoreSummary:" + tss.SummaryID)
 				batch.Put(key, []byte(tss.SummaryID))
 
+				log.Printf("ingest:\n\nkey: %s\nvalue: %s\n\n", key, tss.SummaryID)
+
 				totalTestScoreSummarys++
 
 			case "NAPEventStudentLink":
@@ -197,10 +200,28 @@ func IngestResultsFile(resultsFilePath string) {
 				batch.Put(key, []byte(si.RefId))
 
 				// ASL lookup
-				key = []byte(si.ACARAId)
+				// {acara-id} = {refid}
+				key = []byte(si.ACARAId + ":")
 				batch.Put(key, []byte(si.RefId))
 
 				// SchoolDetails lookup object
+				// not a sif object so needs a guid
+				sd_id := nuid.Next()
+				key = []byte(sd_id)
+				sd := naprr.SchoolDetails{
+					SchoolName: si.SchoolName,
+					ACARAId:    si.ACARAId,
+				}
+				gsd, err := ge.Encode(sd)
+				if err != nil {
+					log.Println("Unable to gob-encode schooldetails: ", err)
+				}
+				// {SchoolDetails-id} = object
+				batch.Put(key, gsd)
+
+				// SchoolDetails-type:{id} = {id}
+				key = []byte("SchoolDetails:" + sd_id)
+				batch.Put(key, []byte(sd_id))
 
 				totalSchools++
 
@@ -217,10 +238,6 @@ func IngestResultsFile(resultsFilePath string) {
 
 				// StudentPersonal-type:{id} = {id}
 				key := []byte("StudentPersonal:" + sp.RefId)
-				batch.Put(key, []byte(sp.RefId))
-
-				// {ASL-school-id}:StudentPersonal-type:{id} = {id}
-				key = []byte(sp.ASLSchoolId + ":StudentPersonal:" + sp.RefId)
 				batch.Put(key, []byte(sp.RefId))
 
 				totalStudents++

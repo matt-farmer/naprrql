@@ -34,7 +34,7 @@ func graphQLHandler(c echo.Context) error {
 	query := grq.Query
 	variables := grq.Variables
 	gqlContext := map[string]interface{}{}
-	// log.Printf("variables: %v\n\n", variables)
+
 	result, err := executor.Execute(gqlContext, query, variables, "")
 	if err != nil {
 		panic(err)
@@ -57,7 +57,8 @@ func RunQLServer() {
 	})
 
 	e.Static("/", "public")
-	e.File("/sifql", "public/index.html")
+	e.File("/sifql", "public/ql_index.html")
+	e.File("/ui", "public/ui_index.html")
 
 	e.POST("/graphql", graphQLHandler)
 
