@@ -21,37 +21,6 @@ function getSchoolInfoSummaryLine(acaraid) {
         "</p>");
 }
 
-// 
-// get student info 1-line summary for given psi
-// 
-function getStudentInfoSummaryLine(psi) {
-
-    var sp = {};
-    var ei = {};
-
-    // data can be found in participation info
-    $.each(participationData, function(index, pds) {
-        ei = pds.EventInfos[0];
-
-        if (ei.Event.PSI == psi) {
-            var student = pds.Student;
-            sp = student;
-            return false;
-        }
-
-    });
-
-    return $("<p>" +
-        "Student: " + sp.GivenName + " " + sp.FamilyName +
-        ", PSI: " + ei.Event.PSI +
-        ", Homegroup: " + sp.Homegroup +
-        ", Class: " + sp.ClassCode +
-        ", Offline: " + sp.OfflineDelivery +
-        ", Ed. Support: " + sp.EducationSupport +
-        ", Home-Schooled: " + sp.HomeSchooledStudent +
-        "</p>");
-
-}
 
 // 
 // builds singl line descriptor for a tetlet
@@ -121,29 +90,6 @@ function initSchoolChooserHandlerQL() {
         // console.log(">" + acaraid + "<");
         currentASLId = acaraid; // store globally for reuse
 
-        // fetch the score summary first as is smallest dataset
-        // var query = JSON.stringify(JSON.parse(scoreSummaryQuery()), null, 2);
-
-        // var query = scoreSummaryQuery();
-        // var variables = JSON.stringify({ acaraIDs: [currentASLId] }, null, 2);
-        // $.post("/graphql", JSON.stringify({ Query: query, Variables: variables }, null, 2), function(response) {
-        //     console.log(response);
-        //     scoresummaryData = [];
-        //     scoresummaryData = response.data.score_summary_report_by_school;
-        //     console.log("score summary data downloaded for " + acaraid +
-        //         " elements: " + scoresummaryData.length);
-
-        //     if (debug) {
-        //         console.log(scoresummaryData);
-        //     }
-
-        //     // display on screen while other reports download
-        //     hideReport();
-        //     createScoreSummaryReport();
-        //     showReport();
-
-        // });
-
         // 
         // get the schoolinfo object for the selected school
         // 
@@ -162,6 +108,26 @@ function initSchoolChooserHandlerQL() {
             query: query,
             variables: { acaraIDs: [currentASLId] },
         }));
+
+        // 
+        // get the student information for the selected school
+        // 
+        var query = studentPersonalQuery();
+        var xhrSP = new XMLHttpRequest();
+        xhrSP.responseType = 'json';
+        xhrSP.open("POST", "/graphql");
+        xhrSP.setRequestHeader("Content-Type", "application/json");
+        xhrSP.setRequestHeader("Accept", "application/json");
+        xhrSP.onload = function() {
+            console.log('data returned:', xhrSP.response);
+            studentPersonalData = [];
+            studentPersonalData = xhrSP.response.data.students_by_school;
+        }
+        xhrSP.send(JSON.stringify({
+            query: query,
+            variables: { acaraIDs: [currentASLId] },
+        }));
+
 
 
         // 
@@ -186,23 +152,27 @@ function initSchoolChooserHandlerQL() {
             variables: { acaraIDs: [currentASLId] },
         }));
 
-        // $.get("/naprr/scoresummary/" + acaraid, function(data, status) {
-        //     scoresummaryData = [];
-        //     scoresummaryData = data;
-        //     console.log("score summary data downloaded for " + acaraid +
-        //         " elements: " + scoresummaryData.length);
+        // 
+        // get the domain scores
+        // 
+        var query = domainScoresQuery();
+        var xhrDS = new XMLHttpRequest();
+        xhrDS.responseType = 'json';
+        xhrDS.open("POST", "/graphql");
+        xhrDS.setRequestHeader("Content-Type", "application/json");
+        xhrDS.setRequestHeader("Accept", "application/json");
+        xhrDS.onload = function() {
+            // console.log('data returned:', xhrDS.response);
+            domainscoresData = [];
+            domainscoresData = xhrDS.response.data.domain_scores_report_by_school;
+        }
+        xhrDS.send(JSON.stringify({
+            query: query,
+            variables: { acaraIDs: [currentASLId] },
+        }));
 
-        //     if (debug) {
-        //         console.log(scoresummaryData);
-        //     }
 
-        //     // display on screen while other reports download
-        //     hideReport();
-        //     createScoreSummaryReport();
-        //     showReport();
-        // });
 
-        // get domain scores
         // $.get("/naprr/domainscores/" + acaraid, function(data, status) {
         //     domainscoresData = [];
         //     domainscoresData = data;
