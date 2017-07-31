@@ -182,5 +182,77 @@ func buildResolvers() map[string]interface{} {
 
 	}
 
+	resolvers["NaplanData/students_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			for _, refid := range studentRefIds {
+				studentids = append(studentids, refid)
+			}
+		}
+
+		return getObjects(studentids)
+
+	}
+
+	resolvers["NaplanData/domain_scores_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			for _, refid := range studentRefIds {
+				studentids = append(studentids, refid)
+			}
+		}
+
+		// get responses for student
+		responseids := make([]string, 0)
+		for _, studentid := range studentids {
+			key := "responseset_by_student:" + studentid
+			responseRefId := getIdentifiers(key)[0]
+			responseids = append(responseids, responseRefId)
+		}
+
+		// get responses
+		responses, err := getObjects(responseids)
+		if err != nil {
+			return []interface{}{}, err
+		}
+
+		// construct RDS by including referenced test
+		results := make([]naprr.ResponseDataSet, 0)
+		for _, response := range responses {
+			resp, _ := response.(xml.NAPResponseSet)
+			tests, err := getObjects([]string{resp.TestID})
+			test, ok := tests[0].(xml.NAPTest)
+			if err != nil || !ok {
+				return []interface{}{}, err
+			}
+			rds := naprr.ResponseDataSet{Test: test, Response: resp}
+			results = append(results, rds)
+		}
+
+		return results, nil
+
+	}
+
 	return resolvers
 }

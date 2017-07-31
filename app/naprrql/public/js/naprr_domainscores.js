@@ -19,6 +19,116 @@ $(document).ready(function()
 });
 
 // 
+// gql query to support search
+// 
+function domainScoresQuery() {
+
+    return `
+query NAPData($acaraIDs: [String]) {
+  domain_scores_report_by_school(acaraIDs: $acaraIDs) {
+    Test {
+      TestID
+      TestContent {
+        LocalId
+        TestName
+        TestLevel
+        TestDomain
+        TestYear
+        StagesCount
+        TestType
+        DomainBands {
+          Band1Lower
+          Band1Upper
+          Band2Lower
+          Band2Upper
+          Band3Lower
+          Band3Upper
+          Band4Lower
+          Band4Upper
+          Band5Lower
+          Band5Upper
+          Band6Lower
+          Band6Upper
+          Band7Lower
+          Band7Upper
+          Band8Lower
+          Band8Upper
+          Band9Lower
+          Band9Upper
+          Band10Lower
+          Band10Upper
+        }
+        DomainProficiency {
+          Level1Lower
+          Level1Upper
+          Level2Lower
+          Level2Upper
+          Level3Lower
+          Level3Upper
+          Level4Lower
+          Level4Upper
+        }
+      }
+    }
+    Response {
+      ResponseID
+      ReportExclusionFlag
+      CalibrationSampleFlag
+      EquatingSampleFlag
+      PathTakenForDomain
+      ParallelTest
+      StudentID
+      PSI
+      TestID
+      TestLocalID
+      DomainScore {
+        RawScore
+        ScaledScoreValue
+        ScaledScoreLogitValue
+        ScaledScoreStandardError
+        ScaledScoreLogitStandardError
+        StudentDomainBand
+        StudentProficiency
+        PlausibleScaledValueList {
+          PlausibleScaledValue
+        }
+      }
+      TestletList {
+        Testlet {
+          NapTestletRefId
+          NapTestletLocalId
+          TestletScore
+          ItemResponseList {
+            ItemResponse {
+              ItemRefID
+              LocalID
+              Response
+              ResponseCorrectness
+              Score
+              LapsedTimeItem
+              SequenceNumber
+              ItemWeight
+              SubscoreList {
+                Subscore {
+                  SubscoreType
+                  SubscoreValue
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+`
+
+}
+
+
+
+// 
 // Fetch data & display for domain scores
 // 
 function createDomainScoresReport()

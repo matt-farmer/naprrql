@@ -120,8 +120,6 @@ func IngestResultsFile(resultsFilePath string) {
 				key = []byte(tss.SchoolInfoRefId + ":NAPTestScoreSummary:" + tss.SummaryID)
 				batch.Put(key, []byte(tss.SummaryID))
 
-				log.Printf("ingest:\n\nkey: %s\nvalue: %s\n\n", key, tss.SummaryID)
-
 				totalTestScoreSummarys++
 
 			case "NAPEventStudentLink":
@@ -163,6 +161,10 @@ func IngestResultsFile(resultsFilePath string) {
 
 				// {test}:NAPStudentResponseSet-type:{student} = {id}
 				key = []byte(r.TestID + ":NAPStudentResponseSet:" + r.StudentID)
+				batch.Put(key, []byte(r.ResponseID))
+
+				// responseset_by_student:{sprefid}:{id} = {id}
+				key = []byte("responseset_by_student:" + r.StudentID + ":" + r.ResponseID)
 				batch.Put(key, []byte(r.ResponseID))
 
 				totalResponses++
@@ -238,6 +240,10 @@ func IngestResultsFile(resultsFilePath string) {
 
 				// StudentPersonal-type:{id} = {id}
 				key := []byte("StudentPersonal:" + sp.RefId)
+				batch.Put(key, []byte(sp.RefId))
+
+				// student_by_acaraid:{id} = {id}
+				key = []byte("student_by_acaraid:" + sp.ASLSchoolId + ":" + sp.RefId)
 				batch.Put(key, []byte(sp.RefId))
 
 				totalStudents++

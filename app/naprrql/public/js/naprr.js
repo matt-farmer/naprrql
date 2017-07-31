@@ -3,6 +3,7 @@ var scoresummaryData = [];
 var participationData = [];
 var domainscoresData = [];
 var codeframeData = [];
+var studentPersonalData = [];
 var schoolinfoData = {};
 var debug =true;
 
