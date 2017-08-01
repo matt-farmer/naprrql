@@ -126,6 +126,25 @@ type NaplanData {
 	school_details: [SchoolDetails]
 	## Get school info data for schools identified by ASL id
 	school_infos_by_acaraid(acaraIDs: [String]): [SchoolInfo]
+	## reporting (ui) object for participation data
+	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
+}
+
+type ParticipationDataSet {
+	Student: RegistrationRecord
+	School: SchoolInfo
+	EventInfos: [EventInfo]
+	Summary: [ParticipationSummary]
+}
+
+type EventInfo {
+	Event: NAPEvent
+	Test: NAPTest
+}
+
+type ParticipationSummary {
+	Domain: String
+	ParticipationCode: String
 }
 
 ## Domain scores reporting object

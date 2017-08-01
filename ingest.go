@@ -141,6 +141,10 @@ func IngestResultsFile(resultsFilePath string) {
 				key = []byte(e.SchoolRefID + ":NAPEventStudentLink:" + e.EventID)
 				batch.Put(key, []byte(e.EventID))
 
+				// {student}:NAPEventStudentLink-type:{id} = {id}
+				key = []byte(e.SPRefID + ":NAPEventStudentLink:" + e.EventID)
+				batch.Put(key, []byte(e.EventID))
+
 				totalEvents++
 
 			case "NAPStudentResponseSet":
