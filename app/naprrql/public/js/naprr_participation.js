@@ -1,15 +1,13 @@
 // naprr_participation.js
 
 // instantiate interaction listeners
-$(document).ready(function()
-{
+$(document).ready(function() {
 
     // initiate modals
     $('.modal').modal();
 
     // create the report when button is clicked
-    $("#btn-participation").on("click", function(event)
-    {
+    $("#btn-participation").on("click", function(event) {
         hideReport();
         createParticipationReport();
         showReport();
@@ -17,12 +15,90 @@ $(document).ready(function()
 
 });
 
+// 
+// gql query to support search
+// 
+function participationQuery() {
+    return `
+query NAPData($acaraIDs: [String]) {
+  participation_report_by_school(acaraIDs: $acaraIDs) {
+    Student {
+      FamilyName
+      GivenName
+      ClassGroup
+      Homegroup
+      OfflineDelivery
+      EducationSupport
+      HomeSchooledStudent
+    }
+    School {
+      SchoolName
+      SchoolSector
+      SchoolType
+      IndependentSchool
+      ACARAId
+      LocalId
+    }
+    EventInfos {
+      Event {
+        EventID
+        SPRefID
+        PSI
+        SchoolRefID
+        SchoolID
+        TestID
+        NAPTestLocalID
+        SchoolSector
+        System
+        SchoolGeolocation
+        ReportingSchoolName
+        JurisdictionID
+        ParticipationCode
+        ParticipationText
+        Device
+        Date
+        StartTime
+        LapsedTimeTest
+        ExemptionReason
+        PersonalDetailsChanged
+        PossibleDuplicate
+        DOBRange
+        TestDisruptionList {
+          TestDisruption {
+            Event
+          }
+        }
+        Adjustment {
+          BookletType
+          PNPCodelist {
+            PNPCode
+          }
+        }
+      }
+      Test {
+        TestContent {
+          TestLevel
+          TestDomain
+        }
+      }
+    }
+    Summary {
+      Domain
+      ParticipationCode
+    }
+  }
+}
+`
+
+}
+
+
+
 
 // 
 // Fetch data & display for participation
 // 
-function createParticipationReport()
-{
+function createParticipationReport() {
 
 
     // order by level & alpha for test name
@@ -50,13 +126,11 @@ function createParticipationReport()
 // 
 // sort data - not required for now
 // 
-function sortParticipationData(data)
-{
+function sortParticipationData(data) {
 
     // console.log(data);
 
-    data.sort(function(a, b)
-    {
+    data.sort(function(a, b) {
 
         var compA = a.EventInfos[0].Test.TestContent.TestLevel.toUpperCase();
         var compB = b.EventInfos[0].Test.TestContent.TestLevel.toUpperCase();
@@ -69,8 +143,7 @@ function sortParticipationData(data)
 // 
 // set the report title
 // 
-function createParticipationTitle()
-{
+function createParticipationTitle() {
     var title = $("#report-title");
     title.empty();
     title.text("Student Participation");
@@ -79,8 +152,7 @@ function createParticipationTitle()
 // 
 // create option selectors to filter data table
 // 
-function createParticipationFilters()
-{
+function createParticipationFilters() {
     $("#report-filters").empty();
     // $("#report-filters").remove();
     $("#report-filters").append(createYearLevelFilter());
@@ -89,8 +161,7 @@ function createParticipationFilters()
 // 
 // create main report table header
 // 
-function createParticipationTableHeader()
-{
+function createParticipationTableHeader() {
 
     $("#report-table-hdr").empty();
     // $("#report-table-hdr").remove();
@@ -113,18 +184,24 @@ function createParticipationTableHeader()
 // 
 // create the main tabular data diplay
 // 
-function createParticipationTableBody(data)
-{
+function createParticipationTableBody(data) {
 
     $("#report-table-body").empty();
     // $("#report-table-body").remove();
 
-    $.each(data, function(index, pds)
-    {
+    $.each(data, function(index, pds) {
 
         var event = pds.EventInfos[0];
         var test = event.Test;
-        var summary = pds.Summary;
+        // var summary = pds.Summary;
+
+        // create map from summary info
+        summary = {};
+        jQuery.each(pds.Summary, function(index, summaryItem) {
+            summary[summaryItem.Domain] = summaryItem.ParticipationCode
+        });
+
+
 
         var $row = $("<tr/>");
         $row.append("<td>" + test.TestContent.TestLevel + "</td>" +
@@ -142,10 +219,8 @@ function createParticipationTableBody(data)
     });
 
     // colour any non-P values
-    $("#report-table-body td.domain").each(function()
-    {
-        if ($(this).text() !== 'P')
-        {
+    $("#report-table-body td.domain").each(function() {
+        if ($(this).text() !== 'P') {
             $(this).css('background-color', '#e3f2fd');
         }
     });
@@ -156,13 +231,11 @@ function createParticipationTableBody(data)
 // set up listeners for table-row selection
 // clicking invokes extended data modal popup
 // 
-function initParticipationTableHandler()
-{
+function initParticipationTableHandler() {
     // remove any existing handlers
     $('#report-content').off("click");
     // respond to table row selections
-    $('#report-content').on("click", '#report-table-body tr', function(event)
-    {
+    $('#report-content').on("click", '#report-table-body tr', function(event) {
         var $row = event.currentTarget;
         var pds = jQuery.data($row, "pdsdata");
         createExtendedDataParticipation(pds);
@@ -176,8 +249,7 @@ function initParticipationTableHandler()
 // show the extended data in a modal
 // footer popup
 // 
-function createExtendedDataParticipation(pdsdata)
-{
+function createExtendedDataParticipation(pdsdata) {
     $("#ed-content").empty();
 
     $("#ed-modal").css("max-height", "85%");
@@ -201,7 +273,7 @@ function createExtendedDataParticipation(pdsdata)
         "Student: " + student.GivenName + " " + student.FamilyName +
         ", PSI: " + event.Event.PSI +
         ", Homegroup: " + student.Homegroup +
-        ", Class: " + student.ClassCode +
+        ", Class: " + student.ClassGroup +
         ", Offline: " + student.OfflineDelivery +
         ", Ed. Support: " + student.EducationSupport +
         ", Home-Schooled: " + student.HomeSchooledStudent +
@@ -241,8 +313,7 @@ function createExtendedDataParticipation(pdsdata)
 
     var domains = ["Grammar and Punctuation", "Numeracy", "Reading", "Spelling", "Writing"];
 
-    for (i = 0; i < domains.length; i++)
-    {
+    for (i = 0; i < domains.length; i++) {
         var eventInfo = getEventInfo(domains[i], pdsdata);
         var $row = $("<tr/>");
         $row.append("<td>" + domains[i] + "</td>" +
@@ -251,7 +322,7 @@ function createExtendedDataParticipation(pdsdata)
             "<td>" + eventInfo.Event.LapsedTimeTest + "</td>" +
             "<td>" + eventInfo.Event.ParticipationCode +
             " (" + eventInfo.Event.ParticipationText + ")</td>" +
-            "<td>" + eventInfo.Event.ExemptionReason + "</td>" +
+            "<td>" + hideNull(eventInfo.Event.ExemptionReason) + "</td>" +
             "<td>" + unpackList(eventInfo.Event.TestDisruptionList) + "</td>" +
             "<td>" + unpackList(eventInfo.Event.Adjustment.PNPCodelist) + "</td>" +
             "<td>" + unpackBool(eventInfo.Event.PossibleDuplicate) + "</td>" +
@@ -271,15 +342,12 @@ function createExtendedDataParticipation(pdsdata)
 // helper function to retrieve event info for 
 // given domain from within nested structure
 // 
-function getEventInfo(domainName, data)
-{
+function getEventInfo(domainName, data) {
 
     ei = {};
 
-    jQuery.each(data.EventInfos, function(index, eventInfo)
-    {
-        if (eventInfo.Test.TestContent.TestDomain == domainName)
-        {
+    jQuery.each(data.EventInfos, function(index, eventInfo) {
+        if (eventInfo.Test.TestContent.TestDomain == domainName) {
             ei = eventInfo;
         }
     });
@@ -292,8 +360,7 @@ function getEventInfo(domainName, data)
 // 
 // add a download link to the csv report for this school
 // 
-function createParticipationDownloadLink()
-{
+function createParticipationDownloadLink() {
 
     $('#download-report').empty();
     $('#download-report').append("<a id='csv-download'>Download report as CSV file</a>");
@@ -303,15 +370,13 @@ function createParticipationDownloadLink()
 // 
 // handle the download
 // 
-function initParticipationDownloadLinkHandler()
-{
+function initParticipationDownloadLinkHandler() {
 
     var reportURL = "/naprr/downloadreport/" + currentASLId + "/participation.csv";
 
     $('#csv-download').off("click");
 
-    $('#csv-download').on("click", function(event)
-    {
+    $('#csv-download').on("click", function(event) {
         window.location.href = reportURL;
 
     });

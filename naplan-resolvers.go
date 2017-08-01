@@ -6,6 +6,20 @@ import (
 	"github.com/playlyfe/go-graphql"
 )
 
+// helper type for summary
+type ParticipationSummary struct {
+	Domain            string
+	ParticipationCode string
+}
+
+// reporting object for student participation
+type ParticipationDataSet struct {
+	Student    xml.RegistrationRecord
+	School     xml.SchoolInfo
+	EventInfos []naprr.EventInfo
+	Summary    []ParticipationSummary
+}
+
 func buildResolvers() map[string]interface{} {
 
 	resolvers := map[string]interface{}{}
@@ -183,6 +197,7 @@ func buildResolvers() map[string]interface{} {
 	}
 
 	resolvers["NaplanData/students_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
 		// get the acara ids from the request params
 		acaraids := make([]string, 0)
 		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
@@ -248,6 +263,84 @@ func buildResolvers() map[string]interface{} {
 			}
 			rds := naprr.ResponseDataSet{Test: test, Response: resp}
 			results = append(results, rds)
+		}
+
+		return results, nil
+
+	}
+
+	resolvers["NaplanData/participation_report_by_school"] = func(params *graphql.ResolveParams) (interface{}, error) {
+
+		// get the acara ids from the request params
+		acaraids := make([]string, 0)
+		for _, a_id := range params.Args["acaraIDs"].([]interface{}) {
+			acaraid, _ := a_id.(string)
+			acaraids = append(acaraids, acaraid)
+		}
+		// log.Printf("acara-ids: \n\n %#v\n\n", acaraids)
+
+		// get students for the schools
+		studentids := make([]string, 0)
+		for _, acaraid := range acaraids {
+			key := "student_by_acaraid:" + acaraid
+			studentRefIds := getIdentifiers(key)
+			for _, refid := range studentRefIds {
+				studentids = append(studentids, refid)
+			}
+		}
+		// log.Printf("studentids: \n\n %#v\n\n", studentids)
+		studentObjs, err := getObjects(studentids)
+		if err != nil {
+			return []interface{}{}, err
+		}
+		// log.Printf("\n\n no students objects: %d", len(studentObjs))
+
+		// iterate students and assemble ParticipationDataSets
+		results := make([]ParticipationDataSet, 0)
+		for _, studentObj := range studentObjs {
+			student, _ := studentObj.(xml.RegistrationRecord)
+			studentEventIds := getIdentifiers(student.RefId + ":NAPEventStudentLink")
+			// log.Printf("\n\n student event ids: \n\n%#v\n\n", studentEventIds)
+			eventObjs, err := getObjects(studentEventIds)
+			if err != nil {
+				return []interface{}{}, err
+			}
+			eventInfos := make([]naprr.EventInfo, 0)
+			for _, eventObj := range eventObjs {
+				event := eventObj.(xml.NAPEvent)
+				// log.Printf("\n\n   event: \n\n%#v\n\n", event)
+				testObj, err := getObjects([]string{event.TestID})
+				if err != nil {
+					return []interface{}{}, err
+				}
+				test := testObj[0].(xml.NAPTest)
+				// log.Printf("\n\n   test: \n\n%#v\n\n", test)
+				eventInfo := naprr.EventInfo{Test: test, Event: event}
+				eventInfos = append(eventInfos, eventInfo)
+			}
+			// log.Printf("\n\n   eventinfos: \n\n%#v\n\n", eventInfos)
+			schoolKey := eventInfos[0].Event.SchoolRefID
+			schoolObj, err := getObjects([]string{schoolKey})
+			if err != nil {
+				return []interface{}{}, err
+			}
+			school, _ := schoolObj[0].(xml.SchoolInfo)
+			// log.Printf("\n\n   school: \n\n%#v\n\n", school)
+			// construct summary
+			summaries := make([]ParticipationSummary, 0)
+			for _, event := range eventInfos {
+				summary := ParticipationSummary{
+					Domain:            event.Test.TestContent.TestDomain,
+					ParticipationCode: event.Event.ParticipationCode}
+				summaries = append(summaries, summary)
+			}
+			pds := ParticipationDataSet{Student: student,
+				School:     school,
+				EventInfos: eventInfos,
+				Summary:    summaries,
+			}
+			// log.Printf("\n\n   pds: \n\n%#v\n\n", pds)
+			results = append(results, pds)
 		}
 
 		return results, nil

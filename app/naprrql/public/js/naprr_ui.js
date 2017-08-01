@@ -155,35 +155,29 @@ function initSchoolChooserHandlerQL() {
         // 
         // get the domain scores
         // 
-        var query = domainScoresQuery();
-        var xhrDS = new XMLHttpRequest();
-        xhrDS.responseType = 'json';
-        xhrDS.open("POST", "/graphql");
-        xhrDS.setRequestHeader("Content-Type", "application/json");
-        xhrDS.setRequestHeader("Accept", "application/json");
-        xhrDS.onload = function() {
-            // console.log('data returned:', xhrDS.response);
-            domainscoresData = [];
-            domainscoresData = xhrDS.response.data.domain_scores_report_by_school;
+        var query = participationQuery();
+        var xhrPD = new XMLHttpRequest();
+        xhrPD.responseType = 'json';
+        xhrPD.open("POST", "/graphql");
+        xhrPD.setRequestHeader("Content-Type", "application/json");
+        xhrPD.setRequestHeader("Accept", "application/json");
+        xhrPD.onload = function() {
+            console.log('data returned:', xhrPD.response);
+            participationData = [];
+            participationData = xhrPD.response.data.participation_report_by_school;
         }
-        xhrDS.send(JSON.stringify({
+        xhrPD.send(JSON.stringify({
             query: query,
             variables: { acaraIDs: [currentASLId] },
         }));
 
 
 
-        // $.get("/naprr/domainscores/" + acaraid, function(data, status) {
-        //     domainscoresData = [];
-        //     domainscoresData = data;
-        //     console.log("domain scores data downloaded for " + acaraid +
-        //         " elements: " + domainscoresData.length);
+        // 
+        // get participation data
+        // 
 
-        //     if (debug) {
-        //         console.log(domainscoresData);
-        //     }
 
-        // });
 
         // $.get("/naprr/participation/" + acaraid, function(data, status) {
         //     participationData = [];
@@ -197,19 +191,6 @@ function initSchoolChooserHandlerQL() {
 
         // });
 
-        // $.get("/naprr/schoolinfo/" + acaraid, function(data, status) {
-        //     schoolinfoData = {};
-        //     schoolinfoData = data;
-        //     console.log("school info data downloaded for " + acaraid);
-
-        //     if (debug) {
-        //         console.log(schoolinfoData);
-        //     }
-
-
-
-
-        // });
 
         // $.get("/naprr/codeframe", function(data, status) {
         //     codeframeData = {};
@@ -404,6 +385,17 @@ function unpackStimulusList(stimList) {
 
     return response;
 
+}
+
+// 
+// helper to manage null field display
+// 
+function hideNull(content) {
+    var s = "";
+    if (content == null) {
+        return s;
+    }
+    return content;
 }
 
 // 
