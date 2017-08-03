@@ -5,6 +5,7 @@
 package naprrql
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -56,11 +57,17 @@ func RunQLServer() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
+	// routes to html/css/javascript resources
 	e.Static("/", "public")
 	e.File("/sifql", "public/ql_index.html")
 	e.File("/ui", "public/ui_index.html")
 
+	// the graphql handler
 	e.POST("/graphql", graphQLHandler)
+
+	fmt.Printf("\n\nBrowse to follwing locations:\n")
+	fmt.Printf("\n\thttp://localhost:1329/ui\n\n for qa report user interface\n")
+	fmt.Printf("\n\thttp://localhost:1329/sifql\n\n for data explorer\n\n")
 
 	e.Logger.Fatal(e.Start(":1329"))
 }

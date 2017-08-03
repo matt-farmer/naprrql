@@ -69,10 +69,19 @@ function initSchoolChooserQL() {
 // 
 function initSchoolChooserHandlerQL() {
 
+
     // 
     // background load all datasets when user selects a new school
     // 
     $("input.autocomplete").on("change", function(event) {
+        // 
+        // set report buttons disabled until data is downloaded
+        // 
+        $("#btn-scoresummary").addClass("disabled");
+        $("#btn-domainscores").addClass("disabled");
+        $("#btn-participation").addClass("disabled");
+        $("#btn-codeframe").addClass("disabled");
+        
         // get the current selected school
         var selection = $('input.autocomplete').val();
         // console.log(selection);
@@ -119,7 +128,7 @@ function initSchoolChooserHandlerQL() {
         xhrSP.setRequestHeader("Content-Type", "application/json");
         xhrSP.setRequestHeader("Accept", "application/json");
         xhrSP.onload = function() {
-            console.log('data returned:', xhrSP.response);
+            // console.log('data returned:', xhrSP.response);
             studentPersonalData = [];
             studentPersonalData = xhrSP.response.data.students_by_school;
         }
@@ -143,6 +152,7 @@ function initSchoolChooserHandlerQL() {
             // console.log('data returned:', xhrSS.response);
             scoresummaryData = [];
             scoresummaryData = xhrSS.response.data.score_summary_report_by_school;
+            $("#btn-scoresummary").removeClass("disabled");
             hideReport();
             createScoreSummaryReport();
             showReport();
@@ -155,18 +165,19 @@ function initSchoolChooserHandlerQL() {
         // 
         // get the domain scores
         // 
-        var query = participationQuery();
-        var xhrPD = new XMLHttpRequest();
-        xhrPD.responseType = 'json';
-        xhrPD.open("POST", "/graphql");
-        xhrPD.setRequestHeader("Content-Type", "application/json");
-        xhrPD.setRequestHeader("Accept", "application/json");
-        xhrPD.onload = function() {
-            console.log('data returned:', xhrPD.response);
-            participationData = [];
-            participationData = xhrPD.response.data.participation_report_by_school;
+        var query = domainScoresQuery();
+        var xhrDS = new XMLHttpRequest();
+        xhrDS.responseType = 'json';
+        xhrDS.open("POST", "/graphql");
+        xhrDS.setRequestHeader("Content-Type", "application/json");
+        xhrDS.setRequestHeader("Accept", "application/json");
+        xhrDS.onload = function() {
+            // console.log('data returned:', xhrDS.response);
+            domainscoresData = [];
+            domainscoresData = xhrDS.response.data.domain_scores_report_by_school;
+            $("#btn-domainscores").removeClass("disabled");
         }
-        xhrPD.send(JSON.stringify({
+        xhrDS.send(JSON.stringify({
             query: query,
             variables: { acaraIDs: [currentASLId] },
         }));
@@ -176,32 +187,45 @@ function initSchoolChooserHandlerQL() {
         // 
         // get participation data
         // 
+        var query = participationQuery();
+        var xhrPD = new XMLHttpRequest();
+        xhrPD.responseType = 'json';
+        xhrPD.open("POST", "/graphql");
+        xhrPD.setRequestHeader("Content-Type", "application/json");
+        xhrPD.setRequestHeader("Accept", "application/json");
+        xhrPD.onload = function() {
+            // console.log('data returned:', xhrPD.response);
+            participationData = [];
+            participationData = xhrPD.response.data.participation_report_by_school;
+            $("#btn-participation").removeClass("disabled");
+        }
+        xhrPD.send(JSON.stringify({
+            query: query,
+            variables: { acaraIDs: [currentASLId] },
+        }));
 
 
+        // 
+        // get codeframe data
+        // 
+        var query = codeframeQuery();
+        var xhrCF = new XMLHttpRequest();
+        xhrCF.responseType = 'json';
+        xhrCF.open("POST", "/graphql");
+        xhrCF.setRequestHeader("Content-Type", "application/json");
+        xhrCF.setRequestHeader("Accept", "application/json");
+        xhrCF.onload = function() {
+            // console.log('data returned:', xhrCF.response);
+            codeframeData = [];
+            codeframeData = xhrCF.response.data.codeframe_report;
+            $("#btn-codeframe").removeClass("disabled");
+        }
+        xhrCF.send(JSON.stringify({
+            query: query,
+            variables: { acaraIDs: [currentASLId] },
+        }));
 
-        // $.get("/naprr/participation/" + acaraid, function(data, status) {
-        //     participationData = [];
-        //     participationData = data;
-        //     console.log("participation data downloaded for " + acaraid +
-        //         " elements: " + participationData.length);
 
-        //     if (debug) {
-        //         console.log(participationData);
-        //     }
-
-        // });
-
-
-        // $.get("/naprr/codeframe", function(data, status) {
-        //     codeframeData = {};
-        //     codeframeData = data;
-        //     console.log("codeframe data downloaded.");
-
-        //     if (debug) {
-        //         console.log(codeframeData);
-        //     }
-
-        // });
 
     });
 

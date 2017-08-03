@@ -14,9 +14,7 @@ $(document).ready(function()
 {
 
     // data for school chooser autocomplete
-    // initSchoolChooser();
     initSchoolChooserQL();
-    // initSchoolChooserHandler();
     initSchoolChooserHandlerQL();
 
     // clear the ui
@@ -24,7 +22,7 @@ $(document).ready(function()
 
     // show the privacy warning
     $('.modal').modal();
-    // $('.modal').modal('open');
+    $('#modal1').modal('open');
 
     $(".button-collapse").sideNav();
 
