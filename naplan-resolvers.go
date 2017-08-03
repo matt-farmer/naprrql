@@ -210,9 +210,7 @@ func buildResolvers() map[string]interface{} {
 		for _, acaraid := range acaraids {
 			key := "student_by_acaraid:" + acaraid
 			studentRefIds := getIdentifiers(key)
-			for _, refid := range studentRefIds {
-				studentids = append(studentids, refid)
-			}
+			studentids = append(studentids, studentRefIds...)
 		}
 
 		return getObjects(studentids)
@@ -233,17 +231,15 @@ func buildResolvers() map[string]interface{} {
 		for _, acaraid := range acaraids {
 			key := "student_by_acaraid:" + acaraid
 			studentRefIds := getIdentifiers(key)
-			for _, refid := range studentRefIds {
-				studentids = append(studentids, refid)
-			}
+			studentids = append(studentids, studentRefIds...)
 		}
 
 		// get responses for student
 		responseids := make([]string, 0)
 		for _, studentid := range studentids {
 			key := "responseset_by_student:" + studentid
-			responseRefId := getIdentifiers(key)[0]
-			responseids = append(responseids, responseRefId)
+			responseRefId := getIdentifiers(key)
+			responseids = append(responseids, responseRefId...)
 		}
 
 		// get responses
@@ -256,6 +252,10 @@ func buildResolvers() map[string]interface{} {
 		results := make([]naprr.ResponseDataSet, 0)
 		for _, response := range responses {
 			resp, _ := response.(xml.NAPResponseSet)
+			// domain score entries will be null if response not completed e.g. abandoned
+			if resp.DomainScore.RawScore == "" {
+				continue
+			}
 			tests, err := getObjects([]string{resp.TestID})
 			test, ok := tests[0].(xml.NAPTest)
 			if err != nil || !ok {
@@ -284,9 +284,7 @@ func buildResolvers() map[string]interface{} {
 		for _, acaraid := range acaraids {
 			key := "student_by_acaraid:" + acaraid
 			studentRefIds := getIdentifiers(key)
-			for _, refid := range studentRefIds {
-				studentids = append(studentids, refid)
-			}
+			studentids = append(studentids, studentRefIds...)
 		}
 		// log.Printf("studentids: \n\n %#v\n\n", studentids)
 		studentObjs, err := getObjects(studentids)
@@ -344,6 +342,53 @@ func buildResolvers() map[string]interface{} {
 		}
 
 		return results, nil
+
+	}
+
+	resolvers["NaplanData/codeframe_report"] = func(params *graphql.ResolveParams) (interface{}, error) {
+		// get the codeframe objects
+		codeframes := make([]xml.NAPCodeFrame, 0)
+		codeframeIds := getIdentifiers("NAPCodeFrame")
+		codeFrameObjs, err := getObjects(codeframeIds)
+		if err != nil {
+			return []interface{}{}, err
+		}
+		for _, codeframeObj := range codeFrameObjs {
+			codeFrame, _ := codeframeObj.(xml.NAPCodeFrame)
+			codeframes = append(codeframes, codeFrame)
+		}
+
+		cfds := make([]naprr.CodeFrameDataSet, 0)
+		for _, codeframe := range codeframes {
+			testObj, err := getObjects([]string{codeframe.NAPTestRefId})
+			if err != nil {
+				return []interface{}{}, err
+			}
+			test, _ := testObj[0].(xml.NAPTest)
+			for _, cf_testlet := range codeframe.TestletList.Testlet {
+				tlObj, _ := getObjects([]string{cf_testlet.NAPTestletRefId})
+				if err != nil {
+					return []interface{}{}, err
+				}
+				tl, _ := tlObj[0].(xml.NAPTestlet)
+				for _, cf_item := range cf_testlet.TestItemList.TestItem {
+					tiObj, err := getObjects([]string{cf_item.TestItemRefId})
+					if err != nil {
+						return []interface{}{}, err
+					}
+					ti, _ := tiObj[0].(xml.NAPTestItem)
+					// log.Printf("\t\t%s", ti.TestItemContent.ItemName)
+					cfd := naprr.CodeFrameDataSet{
+						Test:    test,
+						Testlet: tl,
+						Item:    ti,
+					}
+					cfds = append(cfds, cfd)
+				}
+			}
+		}
+
+		return cfds, nil
 
 	}
 

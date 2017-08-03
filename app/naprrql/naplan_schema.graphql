@@ -128,22 +128,46 @@ type NaplanData {
 	school_infos_by_acaraid(acaraIDs: [String]): [SchoolInfo]
 	## reporting (ui) object for participation data
 	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
+	## reporting (ui) object for codeframes
+	codeframe_report: [CodeFrameDataSet]
 }
 
+## Codeframe reporting object
+type CodeFrameDataSet {
+	## The test within the codeframe
+	Test: NAPTest
+	## Testlet associated with the test
+	Testlet: NAPTestlet
+	## The item associated with the testlet
+	Item: NAPTestItem
+}
+
+
+## Particpation reporting onject
 type ParticipationDataSet {
+	## The student who's participation is being reported
 	Student: RegistrationRecord
+	## The school they belong to
 	School: SchoolInfo
+	## The events they particpated in
 	EventInfos: [EventInfo]
+	## A summary of their participation by domain
 	Summary: [ParticipationSummary]
 }
 
+## Event information reporting object
 type EventInfo {
+	## The event participated in
 	Event: NAPEvent
+	## The test related to the event
 	Test: NAPTest
 }
 
+## Overview summary object of the student participation
 type ParticipationSummary {
+	## The test domain
 	Domain: String
+	## The participation code for the student
 	ParticipationCode: String
 }
 

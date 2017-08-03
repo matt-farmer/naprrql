@@ -121,8 +121,7 @@ query NAPData($acaraIDs: [String]) {
     }
   }
 }
-
-`
+`;
 
 }
 
@@ -166,6 +165,9 @@ function sortDomainScoresData(data)
 
     data.sort(function(a, b)
     {
+        // console.log(a);
+        // console.log(b);
+        
         var compA = a.Test.TestContent.TestLevel.toUpperCase() +
             a.Test.TestContent.TestDomain.toUpperCase() +
             a.Response.DomainScore.StudentDomainBand.toUpperCase();

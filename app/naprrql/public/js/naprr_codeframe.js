@@ -21,6 +21,100 @@ $(document).ready(function()
 
 });
 
+
+// 
+// gql query for data
+// 
+function codeframeQuery() {
+    return `
+query NAPData {
+  codeframe_report {
+    Test {
+      TestID
+      TestContent {
+        TestLevel
+        TestDomain
+        TestYear
+        StagesCount
+        TestType
+        LocalId
+      }
+    }
+    Testlet {
+      TestletContent {
+        TestletName
+        LocationInStage
+        Node
+        TestletMaximumScore
+      }
+    }
+    Item {
+      TestItemContent {
+        NAPTestItemLocalId
+        ItemName
+        ItemType
+        Subdomain
+        WritingGenre
+        ItemDescriptor
+        ReleasedStatus
+        MarkingType
+        MultipleChoiceOptionCount
+        CorrectAnswer
+        MaximumScore
+        ItemDifficulty
+        ItemDifficultyLogit5
+        ItemDifficultyLogit62
+        ItemDifficultyLogit5SE
+        ItemDifficultyLogit62SE
+        ItemProficiencyBand
+        ItemProficiencyLevel
+        ExemplarURL
+        ItemSubstitutedForList {
+          SubstituteItem {
+            SubstituteItemRefId
+            LocalId
+            PNPCodeList {
+              PNPCode
+            }
+          }
+        }
+        ContentDescriptionList {
+          ContentDescription
+        }
+        StimulusList {
+          Stimulus {
+            LocalId
+            TextGenre
+            TextType
+            WordCount
+            TextDescriptor
+            Content
+          }
+        }
+        NAPWritingRubricList {
+          NAPWritingRubric {
+            RubricType
+            Descriptor
+            ScoreList {
+              Score {
+                MaxScoreValue
+                ScoreDescriptionList {
+                  ScoreDescription {
+                    ScoreValue
+                    Descriptor
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;
+}
+
 // 
 // Fetch data & display for codeframe
 // 
