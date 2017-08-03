@@ -9,13 +9,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"syscall"
 
 	"github.com/matt-farmer/naprrql"
 )
 
-var ingest = flag.Bool("ingest", false, "forces re-load of data from results file.")
+var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
 
 func main() {
 
@@ -33,7 +34,10 @@ func main() {
 	// ingest results data, and exit to save memory
 	if *ingest {
 		clearDBWorkingDirectory()
-		naprrql.IngestResultsFile("master_nap.xml.zip")
+		resultsFiles := parseResultsFileDirectory()
+		for _, resultsFile := range resultsFiles {
+			naprrql.IngestResultsFile(resultsFile)
+		}
 		closeDB()
 		os.Exit(1)
 	} else {
@@ -50,6 +54,26 @@ func main() {
 }
 
 //
+// look for results data files
+//
+func parseResultsFileDirectory() []string {
+
+	files := make([]string, 0)
+
+	zipFiles, _ := filepath.Glob("./in/*.zip")
+	xmlFiles, _ := filepath.Glob("./in/*.xml")
+
+	files = append(files, zipFiles...)
+	files = append(files, xmlFiles...)
+	if len(files) == 0 {
+		log.Fatalln("No results data *.xml.zip or *.xml files found in input folder /in.")
+	}
+
+	return files
+
+}
+
+//
 // ensure clean shutdown of data store
 //
 func closeDB() {
@@ -58,6 +82,9 @@ func closeDB() {
 	log.Println("Datastore closed.")
 }
 
+//
+// remove working files of datastore
+//
 func clearDBWorkingDirectory() {
 
 	// remove existing logs and recreate the directory

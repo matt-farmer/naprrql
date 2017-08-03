@@ -21,7 +21,7 @@ func IngestResultsFile(resultsFilePath string) {
 		log.Fatalln("unable to open results file")
 	}
 
-	log.Println("Reading data file...")
+	log.Printf("Reading data file [%s]", resultsFilePath)
 
 	batch := new(leveldb.Batch)
 
@@ -262,11 +262,6 @@ func IngestResultsFile(resultsFilePath string) {
 	if batcherr != nil {
 		log.Fatalln("batch error: ", batcherr)
 	}
-	log.Println("Closing db...")
-	err = db.Close()
-	if err != nil {
-		log.Println("Error closing database: ", err)
-	}
 
 	log.Println("Data file read complete...")
 	log.Printf("Total tests: %d \n", totalTests)
@@ -279,6 +274,6 @@ func IngestResultsFile(resultsFilePath string) {
 	log.Printf("Total schools: %d \n", totalSchools)
 	log.Printf("Total students: %d \n", totalStudents)
 
-	log.Printf("ingestion complete for %s", resultsFilePath)
+	log.Printf("ingestion complete for [%s]", resultsFilePath)
 
 }

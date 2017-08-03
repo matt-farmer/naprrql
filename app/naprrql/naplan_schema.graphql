@@ -1,4 +1,58 @@
 
+## All NAPLAN Test results data for a given school
+type NaplanData {
+	## NAPLAN tests within this results set
+	tests: [NAPTest]
+	## Number of NAPLAN tests within this results set
+	tests_count: Int
+	## Testlets used within this NAPLAN Test 
+	testlets: [NAPTestlet]
+	## Number of teslets used in this NAPLAN test
+	testlets_count: Int
+	## Test Items used in this NAPLAN test
+	testitems: [NAPTestItem]
+	## Number of test items in this results set
+	testitems_count: Int
+	## CodeFrame structure of this NAPLAN Test
+	codeframes: [NAPCodeFrame]
+	## number of codeframes in this results set
+	codeframes_count: Int
+	## Students at this school
+	students: [RegistrationRecord]
+	## number of student records in resuluts set
+	students_count: Int
+	## Test events students participated in
+	events: [NAPEvent]
+	## number of student-test events in results set
+	events_count: Int
+	## The student responses from this school
+	responses: [NAPResponseSet]
+	## The number of student responses in the reults set
+	responses_count: Int
+	## summary of scores for school
+	score_summaries: [ScoreSummary]
+	## number of score summary objects in results set
+	score_summaries_count: Int
+	## School info of schools in this result set
+	schools: [SchoolInfo]
+	## Number of schools in this results set
+	schools_count: Int
+	## School basic details (name, acara asl id)
+	school_details: [SchoolDetails]
+	## Get school info data for schools identified by ASL id
+	school_infos_by_acaraid(acaraIDs: [String]): [SchoolInfo]
+	## filtered list of students by school (asl acara id)
+	students_by_school(acaraIDs: [String]): [RegistrationRecord]
+	## reporting (ui) object for domain scores
+	domain_scores_report_by_school(acaraIDs: [String]): [ResponseDataSet]
+	## reporting (ui) object for score summaries
+	score_summary_report_by_school(acaraIDs: [String]): [ScoreSummaryDataSet]
+	## reporting (ui) object for participation data
+	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
+	## reporting (ui) object for codeframes
+	codeframe_report: [CodeFrameDataSet]
+}
+
 ## Reason why sitting test was interrupted
 type TestDisruption {
 	## the disruption event description
@@ -77,60 +131,6 @@ type TestDisruptionList {
 	TestDisruption: [TestDisruption]
 }
 
-
-## All NAPLAN Test results data for a given school
-type NaplanData {
-	## Test events students participated in
-	events: [NAPEvent]
-	## number of student-test events in results set
-	events_count: Int
-	## The student responses from this school
-	responses: [NAPResponseSet]
-	## The number of student responses in the reults set
-	responses_count: Int
-	## reporting (ui) object for domain scores
-	domain_scores_report_by_school(acaraIDs: [String]): [ResponseDataSet]
-	## Students at this school
-	students: [RegistrationRecord]
-	## number of student records in resuluts set
-	students_count: Int
-	## filtered list of students by school (asl acara id)
-	students_by_school(acaraIDs: [String]): [RegistrationRecord]
-	## summary of scores for school
-	score_summaries: [ScoreSummary]
-	## number of score summary objects in results set
-	score_summaries_count: Int
-	## reporting (ui) object for score summaries
-	score_summary_report_by_school(acaraIDs: [String]): [ScoreSummaryDataSet]
-	## NAPLAN tests within this results set
-	tests: [NAPTest]
-	## Number of NAPLAN tests within this results set
-	tests_count: Int
-	## Testlets used within this NAPLAN Test 
-	testlets: [NAPTestlet]
-	## Number of teslets used in this NAPLAN test
-	testlets_count: Int
-	## CodeFrame structure of this NAPLAN Test
-	codeframes: [NAPCodeFrame]
-	## number of codeframes in this results set
-	codeframes_count: Int
-	## Test Items used in this NAPLAN test
-	testitems: [NAPTestItem]
-	## Number of test items in this results set
-	testitems_count: Int
-	## School info of schools in this result set
-	schools: [SchoolInfo]
-	## Number of schools in this results set
-	schools_count: Int
-	## School basic details (name, acara asl id)
-	school_details: [SchoolDetails]
-	## Get school info data for schools identified by ASL id
-	school_infos_by_acaraid(acaraIDs: [String]): [SchoolInfo]
-	## reporting (ui) object for participation data
-	participation_report_by_school(acaraIDs: [String]): [ParticipationDataSet]
-	## reporting (ui) object for codeframes
-	codeframe_report: [CodeFrameDataSet]
-}
 
 ## Codeframe reporting object
 type CodeFrameDataSet {
