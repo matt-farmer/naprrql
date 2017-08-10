@@ -16,7 +16,7 @@ do_build() {
 	go get
 	GOOS="$GOOS" GOARCH="$GOARCH" go build -ldflags="$LDFLAGS" -o $OUTPUT/$HARNESS
 	cd ..
-	rsync -a naprrql/naplan_schema.graphql naprrql/public naprrql/master_nap.xml.zip $OUTPUT/
+	rsync -a naprrql/naplan_schema.graphql naprrql/public naprrql/in $OUTPUT/
 }
 
 # do_shells() {

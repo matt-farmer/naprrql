@@ -372,7 +372,7 @@ function createParticipationDownloadLink() {
 // 
 function initParticipationDownloadLinkHandler() {
 
-    var reportURL = "/naprr/downloadreport/" + currentASLId + "/participation.csv";
+    var reportURL = "/naprr/downloadreport/" + currentASLId + "/schoolParticipation.csv";
 
     $('#csv-download').off("click");
 
