@@ -374,7 +374,7 @@ function createDomainScoresDownloadLink()
 function initDomainScoresDownloadLinkHandler()
 {
 
-    var reportURL = "/naprr/downloadreport/" + currentASLId + "/domain_scores.csv";
+    var reportURL = "/naprr/downloadreport/" + currentASLId + "/schoolDomainScores.csv";
 
     $('#csv-download').off("click");
 

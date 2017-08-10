@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -17,6 +18,7 @@ import (
 )
 
 var ingest = flag.Bool("ingest", false, "Loads data from results file. Exisitng data is overwritten.")
+var report = flag.Bool("report", false, "Creates .csv reports. Existing reports are overwritten")
 
 func main() {
 
@@ -31,26 +33,73 @@ func main() {
 		os.Exit(1)
 	}()
 
-	// ingest results data, and exit to save memory
+	// ingest results data, rebuild reports, and exit to save memory
 	if *ingest {
-		clearDBWorkingDirectory()
-		resultsFiles := parseResultsFileDirectory()
-		for _, resultsFile := range resultsFiles {
-			naprrql.IngestResultsFile(resultsFile)
-		}
+		ingestData()
+		startWebServer(true)
+		writeReports()
+		// shut down
 		closeDB()
 		os.Exit(1)
-	} else {
-		// launch sif-ql service
-		go naprrql.RunQLServer()
-		// launch ui service
 	}
+
+	// create the csv reports
+	if *report {
+		// launch web-server
+		startWebServer(true)
+		// if requested regenerate reports
+		if *report {
+			writeReports()
+		}
+		// shut down
+		closeDB()
+		os.Exit(1)
+	}
+
+	// otherwise just start the webserver
+	startWebServer(false)
 
 	// wait for shutdown
 	for {
 		runtime.Gosched()
 	}
 
+}
+
+//
+// iterate & load any r/r data files provided
+//
+func ingestData() {
+	// ingest the data
+	log.Println("invoking data ingest...")
+	clearDBWorkingDirectory()
+	resultsFiles := parseResultsFileDirectory()
+	for _, resultsFile := range resultsFiles {
+		naprrql.IngestResultsFile(resultsFile)
+	}
+}
+
+//
+// launch the webserver
+//
+func startWebServer(silent bool) {
+	go naprrql.RunQLServer()
+	if !silent {
+		fmt.Printf("\n\nBrowse to follwing locations:\n")
+		fmt.Printf("\n\thttp://localhost:1329/ui\n\n for qa report user interface\n")
+		fmt.Printf("\n\thttp://localhost:1329/sifql\n\n for data explorer\n\n")
+	}
+
+}
+
+//
+// create .csv reports
+//
+func writeReports() {
+	clearReportsDirectory()
+	log.Println("generating reports...")
+	naprrql.GenerateReports()
+	log.Println("reports generated...")
 }
 
 //
@@ -95,6 +144,33 @@ func clearDBWorkingDirectory() {
 	createDBWorkingDirectory()
 }
 
+//
+// remove reports working directory
+//
+func clearReportsDirectory() {
+	// remove existing logs and recreate the directory
+	err := os.RemoveAll("out")
+	if err != nil {
+		log.Println("Error trying to reset reports directory: ", err)
+	}
+	createReportsDirectory()
+
+}
+
+//
+// create folder for .csv reports
+//
+func createReportsDirectory() {
+	err := os.Mkdir("out", os.ModePerm)
+	if !os.IsExist(err) && err != nil {
+		log.Fatalln("Error trying to create reports directory: ", err)
+	}
+
+}
+
+//
+// create folder for datastore
+//
 func createDBWorkingDirectory() {
 	err := os.Mkdir("kvs", os.ModePerm)
 	if !os.IsExist(err) && err != nil {

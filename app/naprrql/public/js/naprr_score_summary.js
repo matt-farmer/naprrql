@@ -280,7 +280,7 @@ function createScoreSummaryDownloadLink() {
 // 
 function initScoreSummaryDownloadLinkHandler() {
 
-    var reportURL = "/naprr/downloadreport/" + currentASLId + "/score_summary.csv";
+    var reportURL = "/naprr/downloadreport/" + currentASLId + "/schoolScoreSummaries.csv";
 
     $('#csv-download').off("click");
 
